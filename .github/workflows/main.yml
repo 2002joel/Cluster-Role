@@ -1,3 +1,0 @@
-git add .
-git commit -m "Configurar conexión con Aiven DB en GitHub Actions"
-git push origin main
