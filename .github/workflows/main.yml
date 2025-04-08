@@ -1,3 +1,28 @@
-git add .
-git commit -m "Configurar conexión con Aiven DB en GitHub Actions"
-git push origin main
+name: CI Workflow
+
+on:
+  push:
+    branches:
+      
+main  
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    
+name: Check out the repository
+    uses: actions/checkout@v2
+
+    
+name: Set up PostgreSQL (si usas PostgreSQL en Aiven)
+    uses: docker://postgres:latest
+    env:
+      POSTGRES_USER: ${{ secrets.DB_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      POSTGRES_DB: ${{ secrets.DB_NAME }}
+    run: |
+      echo "Conectando a la base de datos..."
+      PGPASSWORD=${{ secrets.DB_PASSWORD }} psql -h ${{ secrets.DB_HOST }} -U ${{ secrets.DB_USER }} -d ${{ secrets.DB_NAME }} -p ${{ secrets.DB_PORT }} -c "SELECT NOW();"
+
