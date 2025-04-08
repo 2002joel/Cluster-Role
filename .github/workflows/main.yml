@@ -1,0 +1,31 @@
+name: Test Aiven MySQL Connection
+
+on:
+  push:
+    branches: 
+      - main  # Esta acción se ejecuta cuando haces un push en la rama 'main'
+
+jobs:
+  test-connection:
+    runs-on: ubuntu-latest  # El flujo de trabajo se ejecuta en un runner de Ubuntu
+
+    steps:
+      
+      - name: Checkout code
+        uses: actions/checkout@v2  # Este paso verifica el código en el repositorio
+
+      
+      - name: Install MySQL client
+        run: sudo apt-get install mysql-client  # Instala el cliente de MySQL para poder hacer la conexión
+
+      
+      - name: Test MySQL connection to Aiven
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}       # Obtiene el valor del secreto DB_HOST
+          DB_USER: ${{ secrets.DB_USER }}       # Obtiene el valor del secreto DB_USER
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }} # Obtiene el valor del secreto DB_PASSWORD
+          DB_NAME: ${{ secrets.DB_NAME }}       # Obtiene el valor del secreto DB_NAME
+          DB_PORT: ${{ secrets.DB_PORT }}       # Obtiene el valor del secreto DB_PORT
+        run: |
+          echo "Probar conexión a MySQL en Aiven..."
+          mysql -h $DB_HOST -P $DB_PORT -u $DB_USER -p$DB_PASSWORD -D $DB_NAME -e "SELECT NOW();"
