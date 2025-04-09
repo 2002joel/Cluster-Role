@@ -4,18 +4,37 @@ session_start();
 require "conexion.php";
 
 // Establecer conexión
-$conn = new mysqli($host, $user, $password, $dbname);
+$conn = new mysqli($host, $user, $password, $dbname, $port);
 if ($conn->connect_error) {
   die('Error de conexión: ' . $conn->connect_error);
 }
 
-// Obtener el modo (registro o login)
+// Comprobar si el modo (registro o login) está definido
+if (!isset($_POST['modo']) || !isset($_POST['email']) || !isset($_POST['password'])) {
+  echo "Faltan parámetros en la solicitud.";
+  exit();
+}
+
 $modo = $_POST['modo'];
 $email = $_POST['email'];
 $password = $_POST['password'];  // Capturamos la contraseña tal como se recibe desde el formulario
 
+// Sanitize inputs (para evitar posibles inyecciones de SQL)
+$email = filter_var($email, FILTER_SANITIZE_EMAIL);
+
 if ($modo === 'registro') {
+  // Validar que el correo electrónico sea válido
+  if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    echo "El correo electrónico no es válido.";
+    exit();
+  }
+
   // Registro de usuario
+  if (!isset($_POST['nombre'])) {
+    echo "Faltan datos para el registro.";
+    exit();
+  }
+
   $nombre = $_POST['nombre'];
   $passwordHash = password_hash($password, PASSWORD_DEFAULT);  // Encriptamos la contraseña
 
@@ -47,8 +66,9 @@ if ($modo === 'registro') {
 
   if ($usuario && password_verify($password, $usuario['pass'])) {
     // Si las credenciales son correctas
+    $_SESSION['user_id'] = $usuario['id'];  // Iniciar sesión
+    $_SESSION['user_name'] = $usuario['nombre'];
     echo "Bienvenido, " . $usuario['nombre'];
-    // Aquí podrías iniciar sesión con $_SESSION, etc.
   } else {
     echo "Credenciales incorrectas.";
   }
@@ -56,4 +76,5 @@ if ($modo === 'registro') {
 
 $conn->close();
 ?>
+
 
