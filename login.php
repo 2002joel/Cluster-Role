@@ -24,7 +24,7 @@ if ($modo === 'registro') {
   if ($result->num_rows > 0) {
     echo "Este correo ya está registrado.";
   } else {
-    $stmt = $conn->prepare("INSERT INTO usuarios (nombre, email, password) VALUES (?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO usuarios (nombre, email, pass) VALUES (?, ?, ?)");
     $stmt->bind_param("sss", $nombre, $email, $password);
     if ($stmt->execute()) {
       echo "¡Registro exitoso!";
@@ -40,7 +40,7 @@ if ($modo === 'registro') {
   $result = $stmt->get_result();
   $usuario = $result->fetch_assoc();
 
-  if ($usuario && password_verify($_POST['password'], $usuario['password'])) {
+  if ($usuario && password_verify($_POST['password'], $usuario['pass'])) {
     echo "Bienvenido, " . $usuario['nombre'];
     // Aquí podrías iniciar sesión con $_SESSION, etc.
   } else {
