@@ -1,10 +1,9 @@
 <?php
-$host = 'localhost';
-$db = 'mi_base_de_datos';
-$user = 'root';
-$pass = '';
+session_start();
 
-$conn = new mysqli($host, $user, $pass, $db);
+require "conexion.php";
+
+$conn = new mysqli($host, $user, $password, $dbname);
 if ($conn->connect_error) {
   die('Error de conexión: ' . $conn->connect_error);
 }
