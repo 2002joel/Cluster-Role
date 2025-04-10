@@ -29,14 +29,16 @@ const [result] = await connection.execute(
   [nombre, pass, email]
 );
 
-console.log(nombre);
-    console.log(pass);
-    console.log(email);
+
     await connection.end();
     res.status(200).json({ message: 'Usuario registrado correctamente' });
   } catch (error) {
     console.error('Error en la API /register:', error); // 👈 LOG DETALLADO
     res.status(500).json({ error: 'Error del servidor: ' + error.message });
+
+    console.log(nombre);
+    console.log(pass);
+    console.log(email);
   }
 }
 
