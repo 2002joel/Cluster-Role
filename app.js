@@ -6,7 +6,7 @@ const express = require('express');
 const cors = require('cors');
 
 const app = express();
-const port = 3000;
+const port = 11439;
 
 // Desactivar CORS (permitir cualquier origen)
 app.use(cors()); // Esto permite cualquier origen (es lo opuesto a bloquear CORS)
