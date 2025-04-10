@@ -2,63 +2,53 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Registro de Usuario</title>
+  <title>Login</title>
 </head>
 <body>
-  <h2>Registro de Usuario</h2>
-  <form id="registroForm">
-    <label>Nombre:</label><br>
-    <input type="text" name="nombre" required><br><br>
-
+  <h2>Iniciar sesión</h2>
+  <form id="loginForm">
     <label>Email:</label><br>
     <input type="email" name="email" required><br><br>
 
     <label>Contraseña:</label><br>
     <input type="password" name="pass" required><br><br>
 
-    <button type="submit">Registrarse</button>
+    <button type="submit">Iniciar sesión</button>
   </form>
 
   <script>
-    document.getElementById('registroForm').onsubmit = function(e) {
+    document.getElementById('loginForm').onsubmit = async function(e) {
       e.preventDefault();
 
-      // Obtener los datos del formulario
-      const nombre = e.target.nombre.value;
       const email = e.target.email.value;
       const pass = e.target.pass.value;
 
-      // Mostrar los datos en la consola
-      console.log("Nombre: " + nombre);
       console.log("Email: " + email);
       console.log("Contraseña: " + pass);
 
-      // Crear el objeto FormData para enviar los datos
-      const formData = new FormData(e.target);
-      const data = new URLSearchParams(formData);
+      try {
+        const response = await fetch("/api/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, pass }),
+        });
 
-      const xhr = new XMLHttpRequest();
-      xhr.open("POST", "/api/register", true);
-      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        const data = await response.json();
 
-      xhr.onload = function () {
-        if (xhr.status === 200) {
-          alert("Usuario registrado correctamente.");
+        if (response.ok) {
+          alert("Inicio de sesión exitoso");
         } else {
-          alert("Error en el registro: " + xhr.responseText);
+          alert("Error: " + data.error);
         }
-      };
-
-      xhr.onerror = function () {
-        alert("Error al conectar con el servidor.");
-      };
-
-      xhr.send(data.toString());
+      } catch (err) {
+        alert("Error en la solicitud: " + err.message);
+      }
     };
   </script>
 </body>
 </html>
-
 
 
 
