@@ -1,68 +1,68 @@
 const express = require('express');
 const mysql = require('mysql2');
-const bcrypt = require('bcrypt');
+const cors = require('cors');
 const bodyParser = require('body-parser');
-const path = require('path');
 
+// Configuración de la base de datos
+const db = mysql.createConnection({
+    host: 'mysql-cluster-role-alextorresgomez47-b004.i.aivencloud.com',
+    port: 11439,
+    user: 'avnadmin',
+    password: 'AVNS_tCVtikVVgXH9mp8Rb1F',
+    database: 'defaultdb'
+});
+
+// Conexión a la base de datos
+db.connect((err) => {
+    if (err) {
+        console.error('Error de conexión a la base de datos:', err);
+        process.exit(1);
+    }
+    console.log('Conexión a la base de datos establecida');
+});
+
+// Inicialización de Express
 const app = express();
 const port = 11439;
 
 // Middleware
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static('public'));
+app.use(cors());  // Habilita CORS
+app.use(bodyParser.json());  // Para parsear los datos JSON
 
-// Conexión a MySQL en Aiven
-const conn = mysql.createConnection({
-  host: 'mysql-cluster-role-alextorresgomez47-b004.i.aivencloud.com',
-  user: 'avnadmin',
-  password: 'AVNS_tCVtikVVgXH9mp8Rb1F',
-  database: 'defaultdb',
-  port: 11439,
-  ssl: {
-    rejectUnauthorized: true
-  }
-});
+// Ruta para registrar un nuevo usuario
+app.post('/register', (req, res) => {
+    const { nombre, email, pass } = req.body;
 
-conn.connect((err) => {
-  if (err) {
-    console.error('Error al conectar a MySQL:', err.message);
-    process.exit();
-  }
-  console.log('Conectado a MySQL (Aiven)');
-});
-
-// Página de login
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
-});
-
-// Procesar login
-app.post('/login', (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.send('Faltan datos');
-  }
-
-  conn.query('SELECT * FROM usuarios WHERE email = ?', [email], async (err, results) => {
-    if (err) return res.send('Error al acceder a la base de datos');
-
-    if (results.length === 0) {
-      return res.send('Usuario no encontrado');
+    if (!nombre || !email || !pass) {
+        return res.status(400).json({ success: false, message: 'Todos los campos son obligatorios' });
     }
 
-    const user = results[0];
-    const match = await bcrypt.compare(password, user.pass);
+    // Verificar si el email ya existe
+    db.query('SELECT * FROM usuarios WHERE email = ?', [email], (err, results) => {
+        if (err) {
+            console.error('Error al consultar la base de datos:', err);
+            return res.status(500).json({ success: false, message: 'Error al procesar la solicitud' });
+        }
 
-    if (match) {
-      res.send(`Bienvenido, ${user.nombre}`);
-    } else {
-      res.send('Contraseña incorrecta');
-    }
-  });
+        if (results.length > 0) {
+            return res.status(400).json({ success: false, message: 'El correo ya está registrado' });
+        }
+
+        // Registrar el nuevo usuario
+        const query = 'INSERT INTO usuarios (nombre, email, pass) VALUES (?, ?, ?)';
+        db.query(query, [nombre, email, pass], (err, result) => {
+            if (err) {
+                console.error('Error al insertar en la base de datos:', err);
+                return res.status(500).json({ success: false, message: 'Error al registrar el usuario' });
+            }
+
+            res.status(200).json({ success: true, message: 'Usuario registrado con éxito' });
+        });
+    });
 });
 
+// Iniciar el servidor
 app.listen(port, () => {
-  console.log(`Servidor funcionando en puerto ${port}`);
+    console.log(`Servidor escuchando en el puerto ${port}`);
 });
 
