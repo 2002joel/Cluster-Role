@@ -19,7 +19,8 @@
             }
 
             try {
-                const response = await fetch('http://mysql-cluster-role-alextorresgomez47-b004.i.aivencloud.com:11439/register', {
+                // Cambié la URL para usar HTTPS
+                const response = await fetch('https://mysql-cluster-role-alextorresgomez47-b004.i.aivencloud.com:11439/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -55,6 +56,7 @@
     </form>
 </body>
 </html>
+
 
 
 
