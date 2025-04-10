@@ -50,7 +50,7 @@
     }
 
     try {
-      const res = await fetch('http://localhost:11439/register', {
+      const res = await fetch('http://mysql-cluster-role-alextorresgomez47-b004.i.aivencloud.com:11439/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nombre, email, password })
