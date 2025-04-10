@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     });
 
 const [result] = await connection.execute(
-  'INSERT INTO usuarios (nombre, password, email) VALUES (?, ?, ?)',
+  'INSERT INTO usuarios (nombre, pass, email) VALUES (?, ?, ?)',
   [nombre, pass, email]
 );
 
