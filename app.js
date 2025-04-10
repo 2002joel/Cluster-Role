@@ -1,79 +1,67 @@
-const express = require('express');
-const mysql = require('mysql');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const https = require('https');
-const fs = require('fs'); // Necesario si tienes un certificado SSL
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+    <script>
+        function registerUser(event) {
+            event.preventDefault();
 
-// Configuración de la base de datos
-const db = mysql.createConnection({
-    host: 'mysql-cluster-role-alextorresgomez47-b004.i.aivencloud.com',
-    port: 11439,
-    user: 'avnadmin',
-    password: 'AVNS_tCVtikVVgXH9mp8Rb1F',
-    database: 'defaultdb'
-});
+            const nombre = document.getElementById('nombre').value;
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('pass').value;
 
-// Conectar a la base de datos
-db.connect((err) => {
-    if (err) {
-        console.error('Error de conexión a la base de datos:', err);
-        process.exit(1);  // Salir si no se puede conectar a la base de datos
-    }
-    console.log('Conexión a la base de datos establecida');
-});
-
-// Configuración de Express
-const app = express();
-const port = 11439;
-
-// Middleware para habilitar CORS
-app.use(cors());
-
-// Middleware para manejar datos JSON
-app.use(bodyParser.json());
-
-// Ruta para registrar un nuevo usuario
-app.post('/register', (req, res) => {
-    const { nombre, email, pass } = req.body;
-
-    // Validación de los datos recibidos
-    if (!nombre || !email || !pass) {
-        return res.status(400).json({ success: false, message: 'Todos los campos son obligatorios' });
-    }
-
-    // Verificar si el email ya existe
-    db.query('SELECT * FROM usuarios WHERE email = ?', [email], (err, results) => {
-        if (err) {
-            console.error('Error al consultar la base de datos:', err);
-            return res.status(500).json({ success: false, message: 'Error al procesar la solicitud' });
-        }
-
-        if (results.length > 0) {
-            return res.status(400).json({ success: false, message: 'El correo ya está registrado' });
-        }
-
-        // Insertar el nuevo usuario en la base de datos
-        const query = 'INSERT INTO usuarios (nombre, email, pass) VALUES (?, ?, ?)';
-        db.query(query, [nombre, email, pass], (err, result) => {
-            if (err) {
-                console.error('Error al insertar en la base de datos:', err);
-                return res.status(500).json({ success: false, message: 'Error al registrar el usuario' });
+            // Validación simple
+            if (!nombre || !email || !pass) {
+                alert('Todos los campos son obligatorios');
+                return;
             }
 
-            res.status(200).json({ success: true, message: 'Usuario registrado con éxito' });
-        });
-    });
-});
+            // Crear la solicitud XMLHttpRequest
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'https://mysql-cluster-role-alextorresgomez47-b004.i.aivencloud.com:11439/register', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
 
-// Opcional: Si tienes certificados SSL, configura HTTPS
-// const options = {
-//     key: fs.readFileSync('path/to/private-key.pem'),
-//     cert: fs.readFileSync('path/to/certificate.pem')
-// };
+            // Crear el cuerpo de la solicitud
+            const data = JSON.stringify({ nombre, email, pass });
 
-// Usar https si tienes certificado SSL
-https.createServer(/*options,*/ app).listen(port, () => {
-    console.log(`Servidor HTTPS escuchando en el puerto ${port}`);
-});
+            // Configurar la respuesta
+            xhr.onload = function() {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        alert('Usuario registrado con éxito');
+                        // Aquí podrías redirigir a otra página o hacer algo más
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                } else {
+                    alert('Hubo un error en la solicitud');
+                }
+            };
+
+            xhr.onerror = function() {
+                alert('Hubo un error en la solicitud');
+            };
+
+            // Enviar la solicitud
+            xhr.send(data);
+        }
+    </script>
+</head>
+<body>
+    <h2>Formulario de Registro</h2>
+    <form onsubmit="registerUser(event)">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" required><br><br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" required><br><br>
+        <label for="pass">Contraseña:</label>
+        <input type="password" id="pass" required><br><br>
+        <button type="submit">Registrar</button>
+    </form>
+</body>
+</html>
+
 
