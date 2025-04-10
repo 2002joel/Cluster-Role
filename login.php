@@ -76,5 +76,3 @@ if ($modo === 'registro') {
 
 $conn->close();
 ?>
-
-
