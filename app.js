@@ -1,37 +1,23 @@
-const express = require('express');
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
 const express = require('express');
 const cors = require('cors');
 
+// Inicializa la app de Express
 const app = express();
+
+// Configura el puerto
 const port = 11439;
 
-// Desactivar CORS (permitir cualquier origen)
-app.use(cors()); // Esto permite cualquier origen (es lo opuesto a bloquear CORS)
+// Middleware de CORS para permitir solicitudes desde cualquier origen
+app.use(cors()); 
 
-// Si deseas desactivar CORS completamente, puedes eliminar el uso del middleware `cors`
-// app.use(cors({ origin: false }));
-
-// Rutas y otras configuraciones
-app.get('/', (req, res) => {
-  res.send('CORS desactivado');
-});
-
-app.listen(port, () => {
-  console.log(`Servidor corriendo en http://localhost:${port}`);
-});
-
-
-const app = express();
-const port = 3000;
-
-// Middleware
+// Middleware para procesar las solicitudes JSON
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-// Configuración de la conexión a la base de datos
+// Configuración de la conexión a la base de datos de Aiven
 const conn = mysql.createConnection({
   host: 'mysql-cluster-role-alextorresgomez47-b004.i.aivencloud.com',
   user: 'avnadmin',
@@ -53,10 +39,16 @@ conn.connect((err) => {
   }
 });
 
+// Ruta de prueba (root)
+app.get('/', (req, res) => {
+  res.send('CORS desactivado');
+});
+
 // Ruta para registrar un nuevo usuario
 app.post('/register', async (req, res) => {
   const { nombre, email, password } = req.body;
 
+  // Validar los datos recibidos
   if (!nombre || !email || !password) {
     return res.json({ success: false, message: 'Faltan campos obligatorios.' });
   }
@@ -72,7 +64,7 @@ app.post('/register', async (req, res) => {
         return res.json({ success: false, message: 'Este correo ya está registrado.' });
       }
 
-      // Encriptar la contraseña
+      // Encriptar la contraseña antes de almacenarla
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // Insertar el nuevo usuario en la base de datos
@@ -90,6 +82,7 @@ app.post('/register', async (req, res) => {
 
 // Iniciar el servidor
 app.listen(port, () => {
-  console.log(`Servidor corriendo en http://localhost:${port}`);
+  console.log(`Servidor corriendo en https://mysql-cluster-role-alextorresgomez47-b004.i.aivencloud.com:${port}`);
 });
+
 
