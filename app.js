@@ -2,6 +2,27 @@ const express = require('express');
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
+const express = require('express');
+const cors = require('cors');
+
+const app = express();
+const port = 3000;
+
+// Desactivar CORS (permitir cualquier origen)
+app.use(cors()); // Esto permite cualquier origen (es lo opuesto a bloquear CORS)
+
+// Si deseas desactivar CORS completamente, puedes eliminar el uso del middleware `cors`
+// app.use(cors({ origin: false }));
+
+// Rutas y otras configuraciones
+app.get('/', (req, res) => {
+  res.send('CORS desactivado');
+});
+
+app.listen(port, () => {
+  console.log(`Servidor corriendo en http://localhost:${port}`);
+});
+
 
 const app = express();
 const port = 3000;
