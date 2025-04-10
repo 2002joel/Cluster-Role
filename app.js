@@ -1,5 +1,5 @@
 const express = require('express');
-const mysql = require('mysql2');
+const mysql = require('mysql');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
@@ -12,27 +12,30 @@ const db = mysql.createConnection({
     database: 'defaultdb'
 });
 
-// Conexión a la base de datos
+// Conectar a la base de datos
 db.connect((err) => {
     if (err) {
         console.error('Error de conexión a la base de datos:', err);
-        process.exit(1);
+        process.exit(1);  // Salir si no se puede conectar a la base de datos
     }
     console.log('Conexión a la base de datos establecida');
 });
 
-// Inicialización de Express
+// Configuración de Express
 const app = express();
 const port = 11439;
 
-// Middleware
-app.use(cors());  // Habilita CORS
-app.use(bodyParser.json());  // Para parsear los datos JSON
+// Middleware para habilitar CORS
+app.use(cors());
+
+// Middleware para manejar datos JSON
+app.use(bodyParser.json());
 
 // Ruta para registrar un nuevo usuario
 app.post('/register', (req, res) => {
     const { nombre, email, pass } = req.body;
 
+    // Validación de los datos recibidos
     if (!nombre || !email || !pass) {
         return res.status(400).json({ success: false, message: 'Todos los campos son obligatorios' });
     }
@@ -48,7 +51,7 @@ app.post('/register', (req, res) => {
             return res.status(400).json({ success: false, message: 'El correo ya está registrado' });
         }
 
-        // Registrar el nuevo usuario
+        // Insertar el nuevo usuario en la base de datos
         const query = 'INSERT INTO usuarios (nombre, email, pass) VALUES (?, ?, ?)';
         db.query(query, [nombre, email, pass], (err, result) => {
             if (err) {
@@ -65,4 +68,5 @@ app.post('/register', (req, res) => {
 app.listen(port, () => {
     console.log(`Servidor escuchando en el puerto ${port}`);
 });
+
 
