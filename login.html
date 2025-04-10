@@ -10,7 +10,7 @@
 <div class="card p-4 shadow" style="width: 22rem;">
   <h3 class="text-center mb-3" id="formTitle">Iniciar Sesión</h3>
   
-  <!-- CAMBIAMOS LA URL DE 'action' a la ruta de Node.js -->
+  <!-- Formulario con la URL del servidor Node.js -->
   <form method="POST" action="http://localhost:3000/auth" id="authForm">
     <input type="hidden" name="modo" id="modo" value="login">
 
@@ -24,6 +24,7 @@
       <input type="password" class="form-control" id="password" name="password" required>
     </div>
 
+    <!-- Campo Nombre visible solo en registro -->
     <div class="mb-3 d-none" id="nombreContainer">
       <label for="nombre" class="form-label">Nombre</label>
       <input type="text" class="form-control" id="nombre" name="nombre">
@@ -41,21 +42,31 @@
   const nombreContainer = document.getElementById('nombreContainer');
   const authForm = document.getElementById('authForm');
 
+  // Cambio entre login y registro
   toggleBtn.addEventListener('click', () => {
     const isLogin = modoInput.value === 'login';
+    
+    // Cambiar el valor del campo hidden 'modo' entre 'login' y 'registro'
     modoInput.value = isLogin ? 'registro' : 'login';
+    
+    // Cambiar el texto del título y del botón
     formTitle.textContent = isLogin ? 'Registrarse' : 'Iniciar Sesión';
     toggleBtn.textContent = isLogin ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate';
+    
+    // Mostrar u ocultar el campo de nombre según el modo
     nombreContainer.classList.toggle('d-none');
   });
 
+  // Validación del formulario
   authForm.addEventListener('submit', function(event) {
     const modo = modoInput.value;
+    
+    // Solo validamos el nombre si estamos en modo de registro
     if (modo === 'registro') {
       const nombre = document.getElementById('nombre').value.trim();
       if (!nombre) {
         alert('Por favor ingrese su nombre.');
-        event.preventDefault();
+        event.preventDefault();  // Evitar el envío del formulario si falta el nombre
       }
     }
   });
