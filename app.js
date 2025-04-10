@@ -1,20 +1,18 @@
-const express = require('express');
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
+const express = require('express');
 const cors = require('cors');
 
 const app = express();
-const port = 11439; // El puerto que te dio Aiven para la conexión
+const port = 3000;
 
-// Habilitar CORS
-app.use(cors());
-
-// Middleware para leer los cuerpos de las solicitudes
+// Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cors()); // Esto habilita CORS
 
-// Configuración de la conexión a la base de datos
+// Configuración de la conexión a la base de datos Aiven
 const conn = mysql.createConnection({
   host: 'mysql-cluster-role-alextorresgomez47-b004.i.aivencloud.com',
   user: 'avnadmin',
@@ -32,7 +30,7 @@ conn.connect((err) => {
     console.error('Error conectando a MySQL:', err.message);
     process.exit();
   } else {
-    console.log('Conectado a MySQL');
+    console.log('Conectado a MySQL en Aiven');
   }
 });
 
@@ -73,7 +71,7 @@ app.post('/register', async (req, res) => {
 
 // Iniciar el servidor
 app.listen(port, () => {
-  console.log(`Servidor corriendo en https://mysql-cluster-role-alextorresgomez47-b004.i.aivencloud.com`);
+  console.log(`Servidor corriendo en http://localhost:${port}`);
 });
 
 
