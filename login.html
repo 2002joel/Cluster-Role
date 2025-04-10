@@ -41,8 +41,8 @@
                 }
 
                 try {
-                    // Cambia esta URL por la del servidor de Node.js
-                    const res = await fetch('https://mi-servidor.com:3000/register', {  // URL de tu servidor de Node.js
+                    // Cambia esta URL por la del servidor de Node.js en Aiven
+                    const res = await fetch('https://mysql-cluster-role-alextorresgomez47-b004.i.aivencloud.com:3000/register', {  // URL de tu servidor de Node.js
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ nombre, email, password })
