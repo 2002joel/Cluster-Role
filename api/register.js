@@ -24,10 +24,10 @@ export default async function handler(req, res) {
       }
     });
 
-    const [result] = await connection.execute(
-      'INSERT INTO usuarios (nombre, pass, email) VALUES (?, ?, ?)',
-      [nombre, pass, email]
-    );
+const [result] = await connection.execute(
+  'INSERT INTO usuarios (nombre, password, email) VALUES (?, ?, ?)',
+  [nombre, pass, email]
+);
 
     await connection.end();
     res.status(200).json({ message: 'Usuario registrado correctamente' });
