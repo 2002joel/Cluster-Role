@@ -2,6 +2,8 @@ const express = require('express');
 const mysql = require('mysql');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const https = require('https');
+const fs = require('fs'); // Necesario si tienes un certificado SSL
 
 // Configuración de la base de datos
 const db = mysql.createConnection({
@@ -64,9 +66,14 @@ app.post('/register', (req, res) => {
     });
 });
 
-// Iniciar el servidor
-app.listen(port, () => {
-    console.log(`Servidor escuchando en el puerto ${port}`);
-});
+// Opcional: Si tienes certificados SSL, configura HTTPS
+// const options = {
+//     key: fs.readFileSync('path/to/private-key.pem'),
+//     cert: fs.readFileSync('path/to/certificate.pem')
+// };
 
+// Usar https si tienes certificado SSL
+https.createServer(/*options,*/ app).listen(port, () => {
+    console.log(`Servidor HTTPS escuchando en el puerto ${port}`);
+});
 
