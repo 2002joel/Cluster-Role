@@ -29,8 +29,9 @@ const [result] = await connection.execute(
   [nombre, pass, email]
 );
 
-    console.log(const [result]);
-
+cosole.log(nombre);
+    cosole.log(pass);
+    cosole.log(email);
     await connection.end();
     res.status(200).json({ message: 'Usuario registrado correctamente' });
   } catch (error) {
