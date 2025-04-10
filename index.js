@@ -3,6 +3,7 @@ const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const fs = require('fs');
 
 const app = express();
 const port = 3000;
@@ -25,11 +26,15 @@ const conn = mysql.createConnection({
   database: 'defaultdb',
   port: 11439,
   ssl: {
-    rejectUnauthorized: true
+    rejectUnauthorized: true,
+    // Si necesitas usar certificados SSL, descomenta y configura los archivos correspondientes
+    // ca: fs.readFileSync('path_to_ca.pem'),
+    // key: fs.readFileSync('path_to_client_key.pem'),
+    // cert: fs.readFileSync('path_to_client_cert.pem')
   }
 });
 
-// Conectar
+// Conectar a la base de datos
 conn.connect((err) => {
   if (err) {
     console.error('Error conectando a MySQL:', err.message);
@@ -56,6 +61,7 @@ app.post('/auth', async (req, res) => {
         return res.status(400).send('Este correo ya está registrado.');
       }
 
+      // Hash de la contraseña utilizando bcrypt
       const hashedPassword = await bcrypt.hash(password, 10);
 
       conn.query(
@@ -78,15 +84,16 @@ app.post('/auth', async (req, res) => {
       const match = await bcrypt.compare(password, usuario.pass);
 
       if (match) {
+        // Configurar la sesión del usuario
         req.session.user_id = usuario.id;
         req.session.user_name = usuario.nombre;
-        res.send('Bienvenido, ' + usuario.nombre);
+        return res.send('Bienvenido, ' + usuario.nombre);
       } else {
-        res.status(401).send('Credenciales incorrectas.');
+        return res.status(401).send('Credenciales incorrectas.');
       }
     });
   } else {
-    res.status(400).send('Modo no válido.');
+    return res.status(400).send('Modo no válido.');
   }
 });
 
