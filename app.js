@@ -1,18 +1,17 @@
+const express = require('express');
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
-const express = require('express');
-const cors = require('cors');
+const path = require('path');
 
 const app = express();
-const port = 3000;
+const port = 11439;
 
 // Middleware
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cors()); // Esto habilita CORS
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static('public'));
 
-// Configuración de la conexión a la base de datos Aiven
+// Conexión a MySQL en Aiven
 const conn = mysql.createConnection({
   host: 'mysql-cluster-role-alextorresgomez47-b004.i.aivencloud.com',
   user: 'avnadmin',
@@ -24,54 +23,46 @@ const conn = mysql.createConnection({
   }
 });
 
-// Conectar a la base de datos
 conn.connect((err) => {
   if (err) {
-    console.error('Error conectando a MySQL:', err.message);
+    console.error('Error al conectar a MySQL:', err.message);
     process.exit();
-  } else {
-    console.log('Conectado a MySQL en Aiven');
   }
+  console.log('Conectado a MySQL (Aiven)');
 });
 
-// Ruta para registrar un nuevo usuario
-app.post('/register', async (req, res) => {
-  const { nombre, email, password } = req.body;
-
-  if (!nombre || !email || !password) {
-    return res.json({ success: false, message: 'Faltan campos obligatorios.' });
-  }
-
-  try {
-    // Verificar si el correo ya está registrado
-    conn.query('SELECT * FROM usuarios WHERE email = ?', [email], async (err, results) => {
-      if (err) {
-        return res.json({ success: false, message: 'Error en la base de datos.' });
-      }
-
-      if (results.length > 0) {
-        return res.json({ success: false, message: 'Este correo ya está registrado.' });
-      }
-
-      // Encriptar la contraseña
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      // Insertar el nuevo usuario en la base de datos
-      conn.query('INSERT INTO usuarios (nombre, email, pass) VALUES (?, ?, ?)', [nombre, email, hashedPassword], (err) => {
-        if (err) {
-          return res.json({ success: false, message: 'Error al registrar el usuario.' });
-        }
-        res.json({ success: true, message: 'Usuario registrado exitosamente.' });
-      });
-    });
-  } catch (error) {
-    res.json({ success: false, message: 'Error en el registro.' });
-  }
+// Página de login
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-// Iniciar el servidor
+// Procesar login
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.send('Faltan datos');
+  }
+
+  conn.query('SELECT * FROM usuarios WHERE email = ?', [email], async (err, results) => {
+    if (err) return res.send('Error al acceder a la base de datos');
+
+    if (results.length === 0) {
+      return res.send('Usuario no encontrado');
+    }
+
+    const user = results[0];
+    const match = await bcrypt.compare(password, user.pass);
+
+    if (match) {
+      res.send(`Bienvenido, ${user.nombre}`);
+    } else {
+      res.send('Contraseña incorrecta');
+    }
+  });
+});
+
 app.listen(port, () => {
-  console.log(`Servidor corriendo en http://localhost:${port}`);
+  console.log(`Servidor funcionando en puerto ${port}`);
 });
-
 
