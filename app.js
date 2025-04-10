@@ -1,23 +1,20 @@
+const express = require('express');
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
-const express = require('express');
 const cors = require('cors');
 
-// Inicializa la app de Express
 const app = express();
+const port = 11439; // El puerto que te dio Aiven para la conexión
 
-// Configura el puerto
-const port = 11439;
+// Habilitar CORS
+app.use(cors());
 
-// Middleware de CORS para permitir solicitudes desde cualquier origen
-app.use(cors()); 
-
-// Middleware para procesar las solicitudes JSON
+// Middleware para leer los cuerpos de las solicitudes
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-// Configuración de la conexión a la base de datos de Aiven
+// Configuración de la conexión a la base de datos
 const conn = mysql.createConnection({
   host: 'mysql-cluster-role-alextorresgomez47-b004.i.aivencloud.com',
   user: 'avnadmin',
@@ -39,16 +36,10 @@ conn.connect((err) => {
   }
 });
 
-// Ruta de prueba (root)
-app.get('/', (req, res) => {
-  res.send('CORS desactivado');
-});
-
 // Ruta para registrar un nuevo usuario
 app.post('/register', async (req, res) => {
   const { nombre, email, password } = req.body;
 
-  // Validar los datos recibidos
   if (!nombre || !email || !password) {
     return res.json({ success: false, message: 'Faltan campos obligatorios.' });
   }
@@ -64,7 +55,7 @@ app.post('/register', async (req, res) => {
         return res.json({ success: false, message: 'Este correo ya está registrado.' });
       }
 
-      // Encriptar la contraseña antes de almacenarla
+      // Encriptar la contraseña
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // Insertar el nuevo usuario en la base de datos
@@ -82,7 +73,7 @@ app.post('/register', async (req, res) => {
 
 // Iniciar el servidor
 app.listen(port, () => {
-  console.log(`Servidor corriendo en https://mysql-cluster-role-alextorresgomez47-b004.i.aivencloud.com:${port}`);
+  console.log(`Servidor corriendo en https://mysql-cluster-role-alextorresgomez47-b004.i.aivencloud.com`);
 });
 
 
