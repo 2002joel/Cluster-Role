@@ -1,51 +1,23 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Registro de Usuario</title>
+  <meta charset="UTF-8" />
+  <title>Login</title>
 </head>
 <body>
-  <h2>Registro de Usuario</h2>
-  <form id="registroForm">
-    <label>Nombre:</label><br>
-    <input type="text" name="nombre" required><br><br>
-
-    <label>Email:</label><br>
+  <h2>Iniciar sesión</h2>
+  <form action="login.php" method="POST">
+    <label for="email">Correo:</label><br>
     <input type="email" name="email" required><br><br>
 
-    <label>Contraseña:</label><br>
+    <label for="pass">Contraseña:</label><br>
     <input type="password" name="pass" required><br><br>
 
-    <button type="submit">Registrarse</button>
+    <button type="submit">Iniciar sesión</button>
   </form>
-
-  <script>
-    document.getElementById('registroForm').onsubmit = function(e) {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const data = new URLSearchParams(formData);
-
-      const xhr = new XMLHttpRequest();
-      xhr.open("POST", "/api/register", true);
-      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-
-      xhr.onload = function () {
-        if (xhr.status === 200) {
-          alert("Usuario registrado correctamente.");
-        } else {
-          alert("Error en el registro: " + xhr.responseText);
-        }
-      };
-
-      xhr.onerror = function () {
-        alert("Error al conectar con el servidor.");
-      };
-
-      xhr.send(data.toString());
-    };
-  </script>
 </body>
 </html>
+
 
 
 
