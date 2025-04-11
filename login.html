@@ -1,56 +1,23 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Iniciar Sesión</title>
+  <meta charset="UTF-8" />
+  <title>Login</title>
 </head>
 <body>
-  <h2>Iniciar Sesión</h2>
-  <form id="loginForm">
-    <label>Email:</label><br>
+  <h2>Iniciar sesión</h2>
+  <form action="login.php" method="POST">
+    <label for="email">Correo:</label><br>
     <input type="email" name="email" required><br><br>
 
-    <label>Contraseña:</label><br>
+    <label for="pass">Contraseña:</label><br>
     <input type="password" name="pass" required><br><br>
 
-    <button type="submit">Entrar</button>
+    <button type="submit">Iniciar sesión</button>
   </form>
-
-<script>
-  document.getElementById('loginForm').onsubmit = function (e) {
-    e.preventDefault();
-
-    const form = e.target;
-    const email = form.email.value;
-    const pass = form.pass.value;
-
-    console.log("Email:", email);
-    console.log("Contraseña:", pass);
-
-    const params = `email=${encodeURIComponent(email)}&pass=${encodeURIComponent(pass)}`;
-
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "/api/login", true);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-
-    xhr.onload = function () {
-      if (xhr.status === 200) {
-        alert("Inicio de sesión exitoso");
-      } else {
-        alert("Error en la solicitud: " + xhr.responseText);
-      }
-    };
-
-    xhr.onerror = function () {
-      alert("Error al conectar con el servidor.");
-    };
-
-    xhr.send(params);
-  };
-</script>
-
 </body>
 </html>
+
 
 
 
