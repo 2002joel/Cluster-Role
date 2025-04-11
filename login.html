@@ -16,31 +16,39 @@
     <button type="submit">Entrar</button>
   </form>
 
-  <script>
-    document.getElementById('loginForm').onsubmit = function (e) {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const data = new URLSearchParams(formData);
+<script>
+  document.getElementById('loginForm').onsubmit = function (e) {
+    e.preventDefault();
 
-      const xhr = new XMLHttpRequest();
-      xhr.open("POST", "/api/login", true);
-      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    const form = e.target;
+    const email = form.email.value;
+    const pass = form.pass.value;
 
-      xhr.onload = function () {
-        if (xhr.status === 200) {
-          alert("Inicio de sesión exitoso");
-        } else {
-          alert("Error en la solicitud: " + xhr.responseText);
-        }
-      };
+    console.log("Email:", email);
+    console.log("Contraseña:", pass);
 
-      xhr.onerror = function () {
-        alert("Error al conectar con el servidor.");
-      };
+    const params = `email=${encodeURIComponent(email)}&pass=${encodeURIComponent(pass)}`;
 
-      xhr.send(data.toString());
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/api/login", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    xhr.onload = function () {
+      if (xhr.status === 200) {
+        alert("Inicio de sesión exitoso");
+      } else {
+        alert("Error en la solicitud: " + xhr.responseText);
+      }
     };
-  </script>
+
+    xhr.onerror = function () {
+      alert("Error al conectar con el servidor.");
+    };
+
+    xhr.send(params);
+  };
+</script>
+
 </body>
 </html>
 
