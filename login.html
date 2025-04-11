@@ -2,10 +2,10 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Login</title>
+  <title>Iniciar Sesión</title>
 </head>
 <body>
-  <h2>Iniciar sesión</h2>
+  <h2>Iniciar Sesión</h2>
   <form id="loginForm">
     <label>Email:</label><br>
     <input type="email" name="email" required><br><br>
@@ -13,42 +13,37 @@
     <label>Contraseña:</label><br>
     <input type="password" name="pass" required><br><br>
 
-    <button type="submit">Iniciar sesión</button>
+    <button type="submit">Entrar</button>
   </form>
 
   <script>
-    document.getElementById('loginForm').onsubmit = async function(e) {
+    document.getElementById('loginForm').onsubmit = function (e) {
       e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = new URLSearchParams(formData);
 
-      const email = e.target.email.value;
-      const pass = e.target.pass.value;
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "/api/login", true);
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-      console.log("Email: " + email);
-      console.log("Contraseña: " + pass);
-
-      try {
-        const response = await fetch("/api/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, pass }),
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
+      xhr.onload = function () {
+        if (xhr.status === 200) {
           alert("Inicio de sesión exitoso");
         } else {
-          alert("Error: " + data.error);
+          alert("Error en la solicitud: " + xhr.responseText);
         }
-      } catch (err) {
-        alert("Error en la solicitud: " + err.message);
-      }
+      };
+
+      xhr.onerror = function () {
+        alert("Error al conectar con el servidor.");
+      };
+
+      xhr.send(data.toString());
     };
   </script>
 </body>
 </html>
+
 
 
 
